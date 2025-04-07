@@ -17,7 +17,7 @@ export async function searchSongs(query) {
   }
 
   const songs = data.results.map((song) => ({
-    id: song.trackId,
+    id: `${song.trackId}`,
     title: song.trackName,
     artist: song.artistName,
     cover: song.artworkUrl100,
@@ -28,7 +28,7 @@ export async function searchSongs(query) {
 }
 
 export async function populatePlaylist(trackIds) {
-  const promises = trackIds.map(async (id) => {
+  const promises = trackIds.map(async (id, index) => {
     const response = await fetch(
       `https://itunes.apple.com/lookup?id=${id}&media=music`,
     );
@@ -41,12 +41,12 @@ export async function populatePlaylist(trackIds) {
 
     const song = data.results[0];
     return {
-      id: song.trackId,
+      id: `${song.trackId}`,
       title: song.trackName,
       artist: song.artistName,
       cover: song.artworkUrl100,
       preview: song.previewUrl,
-      score: `${Math.floor(Date.now() / 1000)}`,
+      score: index,
     };
   });
 

@@ -14,7 +14,6 @@ class PlaylistManager {
   async addItem(item) {
     item = {
       ...item,
-      id: String(item.id),
       score: this.getUnixTimestamp(), // unix
     };
     this.playlist[item.id] = item;
@@ -63,7 +62,9 @@ class PlaylistManager {
         direc: inc,
       }),
     });
+
     const { swapId } = await resp.json();
+    console.log(swapId, id, this.playlist);
     if (swapId) {
       const temp = this.playlist[id].score;
       this.playlist[id].score = this.playlist[swapId].score;
@@ -79,6 +80,7 @@ class PlaylistManager {
   async reloadState() {
     const response = await fetch("/api/retrieve");
     const data = await response.json();
+    console.log(data);
     data.map((item) => {
       this.playlist[item.id] = item;
     });
