@@ -15,28 +15,25 @@ const app = express();
 app.use(cookieParser());
 app.use(bodyParser.json());
 
-const allowedContents = [
+const publicPaths = [
   "/login",
   "/login.html",
   "/api/login",
-  "/music.png",
   "/login.js",
+  "/music.png",
 ];
 
+function isPublic(path) {
+  return publicPaths.includes(path);
+}
+
 app.use(async (req, res, next) => {
-  // if asking for index.html don't allow to serve if not authenticated
-  const path = req.path;
-  // if not allowed path then check if authenticated
-  if (!allowedContents.includes(path)) {
-    if (!req.cookies.auth) {
-      res.status(401).redirect("/login");
-      return;
-    }
-  } else {
-    if (req.cookies.auth) {
-      res.status(200).redirect("/mytunes");
-      return;
-    }
+  const isAuthenticated = !!req.cookies.auth;
+  if (!isPublic(req.path) && !isAuthenticated) {
+    return res.redirect("/login");
+  }
+  if (isAuthenticated && ["/login", "/login.html"].includes(req.path)) {
+    return res.redirect("/mytunes");
   }
   next();
 });
@@ -72,7 +69,6 @@ app.post("/api/login", async (req, res) => {
 app.get("/api/session", async (req, res) => {
   const { auth, user, role } = req.cookies;
   res.json({
-    auth,
     user,
     role,
   });

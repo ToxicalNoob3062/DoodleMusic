@@ -21,6 +21,7 @@ export async function onSubmit() {
   const addBtns = document.querySelectorAll(".add");
   addBtns.forEach((btn) => {
     btn.addEventListener("click", (e) => {
+      e.stopPropagation();
       const id = e.target.parentNode.id;
       const song = latestSongs.find((song) => String(song.id) === id);
       playlistManager.addItem(song);

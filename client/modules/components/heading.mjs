@@ -3,7 +3,7 @@ const Heading = `
     {{#if search}}
         Songs Matching: <span class="text-lg">{{title}}</span>
     {{else}}
-        Playlist
+        Playlist <span class="text-xs text-red-200">({{user}})</span>
     {{/if}}
     </h2>
 `;

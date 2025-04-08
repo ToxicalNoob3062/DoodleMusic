@@ -1,4 +1,4 @@
-import { renderCollection } from "./dom.mjs";
+import { renderAudioPlayer, renderCollection, renderProfile } from "./dom.mjs";
 import components from "./init.mjs";
 
 class PlaylistManager {
@@ -64,7 +64,6 @@ class PlaylistManager {
     });
 
     const { swapId } = await resp.json();
-    console.log(swapId, id, this.playlist);
     if (swapId) {
       const temp = this.playlist[id].score;
       this.playlist[id].score = this.playlist[swapId].score;
@@ -80,32 +79,69 @@ class PlaylistManager {
   async reloadState() {
     const response = await fetch("/api/retrieve");
     const data = await response.json();
-    console.log(data);
+
     data.map((item) => {
       this.playlist[item.id] = item;
     });
     this.renderUI();
   }
 
-  renderUI() {
+  playSong(newId) {
+    const prevId = localStorage.getItem("currentSong");
+    localStorage.setItem("currentSong", newId);
+    if (prevId) {
+      this.playlist[prevId].playing = false;
+    }
+    this.playlist[newId].playing = true;
+    console.log("Playing song:", this.playlist[newId].title);
+    renderAudioPlayer(this.playlist[newId]);
+    this.renderUI();
+  }
+
+  async renderUI() {
+    //get session
+    const resp = await fetch("/api/session");
+    const session = await resp.json();
+
+    //get playlist
+    const cp = this.getPlaylist();
+    renderProfile(session, cp.length);
+
     // add heading if not present
     const heading = document.querySelector("#playlist_container h2");
     if (!heading) {
-      document
-        .querySelector("#playlist_container")
-        .insertAdjacentHTML("afterbegin", components.Heading({}));
+      document.querySelector("#playlist_container").insertAdjacentHTML(
+        "afterbegin",
+        components.Heading({
+          user: session.user,
+        }),
+      );
     }
 
     // render the playlist
     renderCollection({
       tName: "playlist",
-      songs: this.getPlaylist().map((item) => ({ ...item, inPlist: true })),
+      songs: cp.map((item) => ({ ...item, inPlist: true })),
+    });
+
+    //songs
+    const songs = document.querySelectorAll(".song");
+    songs.forEach((song) => {
+      song.addEventListener("click", (e) => {
+        const tr = e.target.closest(".song");
+        if (!tr) return; // clicked outside a row
+
+        const id = tr.id.split("-")[1]; // e.g., from "audio-123"
+        this.playSong(id);
+      });
     });
 
     // add event listeners to the - buttons
     const removeBtns = document.querySelectorAll(".remove");
     removeBtns.forEach((btn) => {
       btn.addEventListener("click", (e) => {
+        e.stopPropagation();
+
         this.removeItem(e.target.parentNode.id);
       });
     });
@@ -114,6 +150,7 @@ class PlaylistManager {
     const upBtns = document.querySelectorAll(".up");
     upBtns.forEach((btn) => {
       btn.addEventListener("click", (e) => {
+        e.stopPropagation();
         this.swapScores(e.target.parentNode.id, -1);
       });
     });
@@ -122,6 +159,7 @@ class PlaylistManager {
     const downBtns = document.querySelectorAll(".down");
     downBtns.forEach((btn) => {
       btn.addEventListener("click", (e) => {
+        e.stopPropagation();
         this.swapScores(e.target.parentNode.id, 1);
       });
     });
