@@ -52,3 +52,29 @@ export async function renderAudioPlayer(song) {
   const parentContainer = document.querySelector("#audio_container");
   parentContainer.innerHTML = components.Player(song);
 }
+
+export async function renderUsers(users) {
+  const parentContainer = document.querySelector("#people");
+  parentContainer.innerHTML = components.People({ users });
+  const promoteButtons = parentContainer.querySelectorAll(".promote");
+  promoteButtons.forEach((button) => {
+    button.addEventListener("click", async (e) => {
+      e.stopPropagation();
+      const username = e.target.id;
+      await fetch(`/api/promote`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          username: username,
+        }),
+      });
+      renderUsers(
+        users.map((user) =>
+          user.user === username ? { ...user, role: "admin" } : user,
+        ),
+      );
+    });
+  });
+}

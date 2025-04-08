@@ -9,6 +9,8 @@ import {
   removeNode,
   gatherAllNodes,
   swapNode,
+  getAllUser,
+  promoteUser,
 } from "./modules/orm.js";
 
 const app = express();
@@ -102,6 +104,10 @@ app.get("/api/songs", async (req, res) => {
   res.json(songs);
 });
 
+app.get("/api/users", async (req, res) => {
+  return res.json(await getAllUser());
+});
+
 app.post("/api/push", async (req, res) => {
   let itemId = req.body.id;
   let owner = req.cookies.user;
@@ -135,6 +141,12 @@ app.put("/api/modify", async (req, res) => {
 
 app.get("/mytunes", async (req, res) => {
   res.sendFile("index.html", { root: "client" });
+});
+
+app.post("/api/promote", async (req, res) => {
+  const username = req.body.username;
+  const status = await promoteUser(username);
+  return res.sendStatus(status ? 200 : 500);
 });
 
 // start the server

@@ -61,10 +61,27 @@ export const getUser = async (username) => {
 
 export const getAllUser = async () => {
   try {
-    const users = await prisma.user.findMany();
+    let users = await prisma.user.findMany();
+    users = users.map((user) => ({
+      user: user.username,
+      role: user.role,
+    }));
     return users;
   } catch (error) {
     console.error(error);
+  }
+};
+
+export const promoteUser = async (username) => {
+  try {
+    const updatedUser = await prisma.user.update({
+      where: { username },
+      data: { role: "admin" },
+    });
+    return true;
+  } catch (error) {
+    console.error(`Error promoting user ${username}:`, error);
+    return false;
   }
 };
 
