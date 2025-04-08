@@ -36,7 +36,7 @@ export async function renderProfile(session, total) {
     ...session,
     total,
   });
-  const actualProfile = tempContainer.querySelector("#profile");
+  const actualProfile = parentContainer.querySelector("#profile");
   const logoutButton = actualProfile.querySelector("#logout");
   const deleteButton = actualProfile.querySelector("#delete");
   // add listeners

@@ -29,6 +29,15 @@ function isPublic(path) {
 
 app.use(async (req, res, next) => {
   const isAuthenticated = !!req.cookies.auth;
+  if (isAuthenticated) {
+    const cookieExpiration = req.cookies.authExpiration;
+    if (cookieExpiration && Date.now() > cookieExpiration) {
+      res.clearCookie("auth");
+      res.clearCookie("user");
+      res.clearCookie("role");
+      return res.redirect("/login");
+    }
+  }
   if (!isPublic(req.path) && !isAuthenticated) {
     return res.redirect("/login");
   }
@@ -57,10 +66,15 @@ app.post("/api/login", async (req, res) => {
     return;
   }
 
-  // set secure cookie
+  // Set expiration time for the auth cookie
+  const expirationTime = Date.now() + 900000; // 15 minutes from now
   res.cookie("auth", "true", { maxAge: 900000, secure: true });
   res.cookie("user", user.username, { maxAge: 900000, secure: true });
   res.cookie("role", user.role, { maxAge: 900000, secure: true });
+  res.cookie("authExpiration", expirationTime, {
+    maxAge: 900000,
+    secure: true,
+  });
 
   // redirect to home page
   res.send("Login successful");
