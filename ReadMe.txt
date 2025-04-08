@@ -11,4 +11,8 @@ npm start
 
 TESTING INSTRUCTIONS URL:
 
-http://localhost:3000
+http://localhost:3000/login
+
+VIDEO URL:
+
+https://youtu.be/2hEdHoevcgk
