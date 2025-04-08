@@ -55,9 +55,7 @@ export async function renderAudioPlayer(song) {
 
 export async function renderUsers(users) {
   const parentContainer = document.querySelector("#people");
-  if (users.length) parentContainer.innerHTML = components.People({ users });
-  else
-    parentContainer.innerHTML = "<p>You're not worthy to view this page!</p>";
+  parentContainer.innerHTML = components.People({ users });
   const promoteButtons = parentContainer.querySelectorAll(".promote");
   promoteButtons.forEach((button) => {
     button.addEventListener("click", async (e) => {

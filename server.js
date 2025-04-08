@@ -47,7 +47,7 @@ app.use(async (req, res, next) => {
     return res.redirect("/mytunes");
   }
   if (adminPaths.includes(req.path) && req.cookies.role !== "admin") {
-    return res.sendStatus(400).send({
+    return res.status(400).send({
       msg: "Bad Request!",
     });
   }
