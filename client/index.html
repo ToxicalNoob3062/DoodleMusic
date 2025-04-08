@@ -17,7 +17,7 @@
         </style>
     </head>
     <body
-        class="bg-zinc-900 text-slate-300 flex gap-5 justify-center h-screen w-screen p-10"
+        class="bg-zinc-900 text-slate-300 flex gap-5 justify-center h-screen w-screen px-2 pt-10 sm:p-10"
     >
         <div
             id="user_container"
@@ -34,12 +34,13 @@
         </div>
         <div
             id="playlist_container"
-            class="w-1/3 h-[95vh] overflow-y-scroll hide-scrollbar p-4 border-r border-slate-300"
+            class="w-1/3 h-[95vh] overflow-y-scroll hide-scrollbar mt-8"
         ></div>
         <div
             id="search_container"
-            class="w-1/3 h-[95vh] overflow-y-scroll hide-scrollbar flex flex-col p-4"
+            class="w-1/3 h-[95vh] overflow-y-scroll hide-scrollbar flex flex-col p-4 border-l border-slate-300"
         ></div>
         <script type="module" src="index.js"></script>
+        <script type="module" src="responsive.js"></script>
     </body>
 </html>

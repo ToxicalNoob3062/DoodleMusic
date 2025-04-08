@@ -155,6 +155,10 @@ app.get("/users", async (req, res) => {
 app.post("/api/promote", async (req, res) => {
   const username = req.body.username;
   const status = await promoteUser(username);
+  res.cookie("role", status ? "admin" : "guest", {
+    maxAge: 900000,
+    secure: true,
+  });
   return res.sendStatus(status ? 200 : 500);
 });
 

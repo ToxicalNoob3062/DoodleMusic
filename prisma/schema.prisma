@@ -21,7 +21,7 @@ model Node {
   prevId  String?
   nextId  String?
 
-  user User? @relation(fields: [owner], references: [username], onDelete: Cascade)
+  user User? @relation(fields: [owner], references: [username], onDelete: Cascade, onUpdate: Cascade)
 
   @@unique([owner, trackId])
 }

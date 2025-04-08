@@ -1,5 +1,5 @@
 export const Search = `
-    <div id="search_bar" class="flex w-full gap-2 mb-4">
+    <div id="search_bar" class="flex w-full gap-2 mt-12 mb-4">
         <input
             id="search_input"
             type="text"
