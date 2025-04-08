@@ -25,6 +25,8 @@ const publicPaths = [
   "/music.png",
 ];
 
+const adminPaths = ["/api/users", "/api/promote", "/users.html", "/users"];
+
 function isPublic(path) {
   return publicPaths.includes(path);
 }
@@ -45,6 +47,9 @@ app.use(async (req, res, next) => {
   }
   if (isAuthenticated && ["/login", "/login.html"].includes(req.path)) {
     return res.redirect("/mytunes");
+  }
+  if (adminPaths.includes(req.path) && req.cookies.role !== "admin") {
+    return res.sendStatus(400);
   }
   next();
 });
@@ -141,6 +146,10 @@ app.put("/api/modify", async (req, res) => {
 
 app.get("/mytunes", async (req, res) => {
   res.sendFile("index.html", { root: "client" });
+});
+
+app.get("/users", async (req, res) => {
+  res.sendFile("users.html", { root: "client" });
 });
 
 app.post("/api/promote", async (req, res) => {
