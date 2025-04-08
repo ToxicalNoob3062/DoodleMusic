@@ -90,7 +90,8 @@ app.post("/api/login", async (req, res) => {
 });
 
 app.get("/api/session", async (req, res) => {
-  if (!!req.cookies.auth)
+  const authorized = !!req.cookies.auth;
+  if (!authorized)
     return res.status(401).send({
       msg: "Unauthorized!",
     });
