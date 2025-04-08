@@ -4,18 +4,13 @@ export async function searchSongs(query) {
       query,
     )}&media=music`,
   );
-
   if (!response.ok) {
-    console.log("No results found.");
     return [];
   }
   const data = await response?.json();
-
   if (data.results.length === 0) {
-    console.log("No results found.");
     return [];
   }
-
   const songs = data.results.map((song) => ({
     id: `${song.trackId}`,
     title: song.trackName,
@@ -33,12 +28,9 @@ export async function populatePlaylist(trackIds) {
       `https://itunes.apple.com/lookup?id=${id}&media=music`,
     );
     const data = await response.json();
-
     if (data.results.length === 0) {
-      console.log(`No song found for ID ${id}.`);
       return null;
     }
-
     const song = data.results[0];
     return {
       id: `${song.trackId}`,
@@ -49,7 +41,6 @@ export async function populatePlaylist(trackIds) {
       score: index,
     };
   });
-
   const songs = await Promise.all(promises);
   return songs.filter((song) => song !== null);
 }

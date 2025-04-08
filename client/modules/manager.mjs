@@ -27,8 +27,13 @@ class PlaylistManager {
       }),
     });
 
+    if (!resp.ok && resp.status == 401) {
+      window.location.href = "/login";
+    }
+
     if (!resp.ok) {
       alert("500: Server Error");
+      return;
     }
 
     this.renderUI();
@@ -45,8 +50,14 @@ class PlaylistManager {
         id: id,
       }),
     });
+
+    if (!resp.ok && resp.status == 401) {
+      window.location.href = "/login";
+    }
+
     if (!resp.ok) {
       alert("500: Server Error");
+      return;
     }
     this.renderUI();
   }
@@ -63,13 +74,17 @@ class PlaylistManager {
       }),
     });
 
+    if (!resp.ok && resp.status == 401) {
+      window.location.href = "/login";
+    }
+
     const { swapId } = await resp.json();
     if (swapId) {
       const temp = this.playlist[id].score;
       this.playlist[id].score = this.playlist[swapId].score;
       this.playlist[swapId].score = temp;
+      this.renderUI();
     }
-    this.renderUI();
   }
 
   getPlaylist() {
@@ -79,7 +94,6 @@ class PlaylistManager {
   async reloadState() {
     const response = await fetch("/api/retrieve");
     const data = await response.json();
-
     data.map((item) => {
       this.playlist[item.id] = item;
     });
@@ -102,6 +116,9 @@ class PlaylistManager {
     //get session
     const resp = await fetch("/api/session");
     const session = await resp.json();
+    if (!resp.ok && resp.status == 401) {
+      window.location.href = "/login";
+    }
 
     //get playlist
     const cp = this.getPlaylist();

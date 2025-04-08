@@ -1,50 +1,38 @@
 import { PrismaClient } from "@prisma/client";
 import argon2 from "argon2";
 
+// helper function to hash password
 const hashPassword = async (password) => {
-  try {
-    const hashedPassword = await argon2.hash(password);
-    return hashedPassword;
-  } catch (error) {
-    console.error(error);
-  }
+  const hashedPassword = await argon2.hash(password);
+  return hashedPassword;
 };
 
 export const comparePassword = async (plaintextPassword, hashedPassword) => {
-  try {
-    if (await argon2.verify(hashedPassword, plaintextPassword)) {
-      return true;
-    } else {
-      return false;
-    }
-  } catch (error) {
-    console.error(error);
+  if (await argon2.verify(hashedPassword, plaintextPassword)) {
+    return true;
+  } else {
+    return false;
   }
 };
 
 // Initialize Prisma Client
 const prisma = new PrismaClient();
 
-export const createUser = async (username, password) => {
-  const hash = await hashPassword(password);
-  const newUser = await prisma.user.create({
-    data: {
-      username,
-      password: hash,
-    },
-  });
-  console.log("New user created:", newUser);
-  return newUser;
-};
+// Change the user database via these helper methods
 
-export const deleteUser = async (username) => {
+export const createUser = async (username, password) => {
   try {
-    const deletedUser = await prisma.user.delete({
-      where: { username },
+    const hash = await hashPassword(password);
+    const newUser = await prisma.user.create({
+      data: {
+        username,
+        password: hash,
+      },
     });
-    console.log("User deleted:", deletedUser);
-  } catch (error) {
-    console.error(error);
+    return newUser;
+  } catch (err) {
+    console.error(err);
+    return null;
   }
 };
 
@@ -56,6 +44,19 @@ export const getUser = async (username) => {
     return user;
   } catch (error) {
     console.error(error);
+    return null;
+  }
+};
+
+export const deleteUser = async (username) => {
+  try {
+    const deletedUser = await prisma.user.delete({
+      where: { username },
+    });
+    return deletedUser;
+  } catch (error) {
+    console.error(error);
+    return null;
   }
 };
 
@@ -69,6 +70,7 @@ export const getAllUser = async () => {
     return users;
   } catch (error) {
     console.error(error);
+    return [];
   }
 };
 
@@ -78,52 +80,54 @@ export const promoteUser = async (username) => {
       where: { username },
       data: { role: "admin" },
     });
-    return true;
+    return updatedUser;
   } catch (error) {
     console.error(`Error promoting user ${username}:`, error);
-    return false;
+    return null;
   }
 };
 
-const getNode = async (owner, nodeId) => {
+// linked list helper functions
+const getNode = async (owner, trackId) => {
   return await prisma.node.findUnique({
     where: {
       owner_trackId: {
         owner,
-        trackId: nodeId, // Check for an existing node with the same owner and trackId
+        trackId,
       },
     },
   });
 };
 
-const updatePrev = async (owner, nodeId, prev) => {
+const updatePrev = async (owner, trackId, prevId) => {
   await prisma.node.update({
     where: {
       owner_trackId: {
         owner,
-        trackId: nodeId, // Using trackId instead of tackId
+        trackId,
       },
     },
     data: {
-      prevId: prev,
+      prevId,
     },
   });
 };
 
-const updateNext = async (owner, nodeId, next) => {
+const updateNext = async (owner, trackId, nextId) => {
   await prisma.node.update({
     where: {
       owner_trackId: {
         owner,
-        trackId: nodeId, // Using trackId instead of tackId
+        trackId,
       },
     },
     data: {
-      nextId: next,
+      nextId,
     },
   });
 };
 
+//  linkedlist modifiers
 export const addNode = async (owner, nodeId) => {
   if (await getNode(owner, nodeId)) {
     return false;
@@ -267,6 +271,5 @@ export const swapNode = async (owner, nodeId, direction) => {
 
     return next.trackId;
   }
-
   return null;
 };

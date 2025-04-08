@@ -81,12 +81,9 @@ app.post("/api/login", async (req, res) => {
     return;
   }
   // Set expiration time for the auth cookie
-  const expirationTime = Date.now() + 900000; // 15 minutes from now
   res.cookie("auth", "true", { maxAge: 900000, secure: true });
   res.cookie("user", user.username, { maxAge: 900000, secure: true });
   res.cookie("role", user.role, { maxAge: 900000, secure: true });
-
-  // redirect to home page
   res.send({
     msg: "Login Succesfull!",
   });
@@ -150,17 +147,19 @@ app.put("/api/modify", async (req, res) => {
 });
 
 //  User related routes
-app.get("/api/users", async (req, res) => {
-  return res.json(await getAllUser());
+app.get("/api/users", async (_, res) => {
+  const users = await getAllUser();
+  return res.status(users.length > 0 ? 200 : 500).json(users);
 });
 
 app.post("/api/promote", async (req, res) => {
   const username = req.body.username;
   const status = await promoteUser(username);
-  res.cookie("role", status ? "admin" : "guest", {
-    maxAge: 30000,
-    secure: true,
-  });
+  if (status)
+    res.cookie("role", status ? "admin" : "guest", {
+      maxAge: 900000,
+      secure: true,
+    });
   return res.sendStatus(status ? 200 : 500);
 });
 

@@ -55,13 +55,15 @@ export async function renderAudioPlayer(song) {
 
 export async function renderUsers(users) {
   const parentContainer = document.querySelector("#people");
-  parentContainer.innerHTML = components.People({ users });
+  if (users.length) parentContainer.innerHTML = components.People({ users });
+  else
+    parentContainer.innerHTML = "<p>You're not worthy to view this page!</p>";
   const promoteButtons = parentContainer.querySelectorAll(".promote");
   promoteButtons.forEach((button) => {
     button.addEventListener("click", async (e) => {
       e.stopPropagation();
       const username = e.target.id;
-      await fetch(`/api/promote`, {
+      const resp = await fetch(`/api/promote`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -70,11 +72,13 @@ export async function renderUsers(users) {
           username: username,
         }),
       });
-      renderUsers(
-        users.map((user) =>
-          user.user === username ? { ...user, role: "admin" } : user,
-        ),
-      );
+      if (resp.ok)
+        renderUsers(
+          users.map((user) =>
+            user.user === username ? { ...user, role: "admin" } : user,
+          ),
+        );
+      else alert("Promotion Failed Server Error!");
     });
   });
 }

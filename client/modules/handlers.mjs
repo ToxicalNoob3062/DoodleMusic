@@ -12,7 +12,11 @@ export async function onSubmit() {
   }
   search_input.value = "";
 
-  const response = await fetch(`/api/songs?title=${title}`);
+  const response = await fetch(`/api/search?title=${title}`);
+  if (!resp.ok && resp.status == 401) {
+    window.location.href = "/login";
+  }
+
   latestSongs = await response.json();
   renderSearchHeading({ search: true, title });
   renderCollection({ tName: "search", songs: latestSongs });
