@@ -1,0 +1,28 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../client-pg" // custom output directory
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("POSTGRES_URL")
+}
+
+model User {
+  username String  @id
+  password String
+  role     String  @default("guest")
+  tail     String?
+  Node     Node[]
+}
+
+model Node {
+  owner   String
+  trackId String
+  prevId  String?
+  nextId  String?
+
+  user User? @relation(fields: [owner], references: [username], onDelete: Cascade, onUpdate: Cascade)
+
+  @@unique([owner, trackId])
+}
