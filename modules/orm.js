@@ -1,4 +1,6 @@
-import { PrismaClient } from "@prisma/client";
+// import { PrismaClient } from "@prisma/client";
+import { PrismaClient } from "../client-pg/index.js";
+
 import argon2 from "argon2";
 
 // helper function to hash password
